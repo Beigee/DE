@@ -1,0 +1,100 @@
+# hadoop Pseudo-Distributed Operation 설정
+# ref : https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html#Pseudo-Distributed_Operation
+cd $HADOOP_CONF_DIR
+
+# core-site.xml 작성
+vim core-site.xml
+<configuration>
+	<property>
+		<name>fs.defaultFS</name>
+		<value>hdfs://localhost:9000</value>
+	</property>
+</configuration>
+
+# hdfs-site.xml 작성
+vim hdfs-site.xml
+<configuration>
+	<property>
+		<name>dfs.replication</name>
+		<value>1</value>
+	</property>
+</configuration>
+
+# mapred-site.xml 작성
+vim mapred-site.xml
+<configuration>
+    <property>
+        <name>mapreduce.framework.name</name>
+        <value>yarn</value>
+    </property>
+</configuration>
+
+# hadoop user
+export HDFS_NAMENODE_USER=big
+export HDFS_DATANODE_USER=big
+export HDFS_SECONDARYNAMENODE_USER=big
+export YARN_RESOURCEMANAGER_USER=big
+export YARN_NODEMANAGER_USER=big
+
+hdfs namenode -format
+hdfs datanode -format
+
+sudo service ssh start
+
+start-dfs.sh
+
+# namenode, datanode, secondary namenode 가 올라간 것을 확인
+jps
+
+docker commit ...
+
+# 기존의 컨테이너 stop
+# 포트바인딩을 하여 새로운 컨테이너를 생성
+
+docker run -it
+--name scluster
+-h localhost		#호스트명을 지정
+-p 18080:18080		#<호스트포트>:<컨테이너포트> spark web ui
+-p 9870:9870		#namenode
+-p 8081:8081		#jupyter notebook
+-p 9864:9864		#datanode
+#####################
+-p 8088:8088		#yarn resourceManager
+####################
+azimemory/singlenode:1.0
+
+docker run -it `
+--name scluster `
+-h localhost `
+-p 18080:18080 `
+-p 9870:9870 `
+-p 9864:9864 `
+-p 8081:8081 `
+azimemory/singlenode:1.0
+
+docker run -it --name scluster -h localhost -p 18080:18080 -p 9870:9870 -p 8081:8081 azimemory/singlenode:1.0
+# hdfs의 / 에 권한을 777로 설정
+su big
+sudo service ssh start
+start-dfs.sh
+hdfs dfs -chmod 777 /
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
