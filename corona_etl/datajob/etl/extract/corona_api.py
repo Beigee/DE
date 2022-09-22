@@ -20,7 +20,7 @@ class CoronaApiExtractor:
 
 
     @classmethod
-    def extract_data(cls, befor_cnt=1):
+    def extract_data(cls, befor_cnt=2):
 
         for i in range(1, befor_cnt+1):
             params = cls.__create_param(i)
@@ -33,6 +33,7 @@ class CoronaApiExtractor:
             except Exception as e:
                 log_dict = cls.__create_log_dict(params)
                 cls.__dump_log(log_dict, e)
+                raise e
 
 
     @classmethod
